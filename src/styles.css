@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .framed {
+    @apply border-2 border-green-600;
+  }
+
+  #input button {
+    @apply text-3xl font-black text-green-700 w-full h-full relative overflow-hidden;
+  }
+
+  #input div[id] {
+    @apply flex flex-col justify-center items-center;
+  }
+
+  .output-value {
+    @apply text-right h-2/3 text-3xl sm:text-4xl font-bold text-green-800;
+  }
+}
