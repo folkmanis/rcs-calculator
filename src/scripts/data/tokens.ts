@@ -24,6 +24,7 @@ export const buttons: InputToken[] = [
         type: "reset",
         html: 'C',
         keycodes: ['C', 'c', 'Escape'],
+        styles: ['bg-red-300', 'text-white'],
     },
     {
         type: "(",
@@ -48,18 +49,21 @@ export const buttons: InputToken[] = [
         html: '7',
         value: "7",
         keycodes: ['7'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '8',
         value: "8",
         keycodes: ['8'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '9',
         value: "9",
         keycodes: ['9'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "operator",
@@ -74,18 +78,21 @@ export const buttons: InputToken[] = [
         html: '4',
         value: "4",
         keycodes: ['4'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '5',
         value: "5",
         keycodes: ['5'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '6',
         keycodes: ['6'],
         value: "6",
+        styles: ['bg-gray-100'],
     },
     {
         type: "operator",
@@ -100,18 +107,21 @@ export const buttons: InputToken[] = [
         html: '1',
         value: "1",
         keycodes: ["1"],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '2',
         value: "2",
         keycodes: ["2"],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
         html: '3',
         keycodes: ['3'],
         value: "3",
+        styles: ['bg-gray-100'],
     },
     {
         type: "operator",
@@ -131,6 +141,7 @@ export const buttons: InputToken[] = [
         html: '0',
         value: "0",
         keycodes: ['0'],
+        styles: ['bg-gray-100'],
     },
     {
         type: "digit",
