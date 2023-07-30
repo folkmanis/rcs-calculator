@@ -77,7 +77,6 @@ const calculateResult = (state: CalculatorState) => produce(state, draft => {
 const calculateIntermediateResult = (state: CalculatorState) => produce(state, draft => {
     try {
         const result = evaluateTokens(state.tokenStack);
-        console.log(result);
         if (!isNaN(result)) {
             draft.numberInput = result.toString();
         }
