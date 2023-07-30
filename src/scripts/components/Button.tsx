@@ -8,7 +8,7 @@ export interface ButtonProps {
 }
 
 export function Button({ token, onClick }: ButtonProps) {
-  const classes = ['framed', ...(token.styles || [])].join(' ');
+  const classes = ['framed', 'key-button', ...(token.styles || [])].join(' ');
   return (
     <div className={classes}>
       <button onClick={() => onClick(token)}>

@@ -11,7 +11,7 @@
     @apply text-3xl font-black text-green-700 w-full h-full relative overflow-hidden;
   }
 
-  #input div[id] {
+  #input .key-button {
     @apply flex flex-col justify-center items-center;
   }
 
