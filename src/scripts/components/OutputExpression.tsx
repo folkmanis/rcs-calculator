@@ -1,5 +1,4 @@
 import parse from 'html-react-parser';
-import { MathToken } from '../data/token.interface';
 
 export interface OutputExpressionProps {
   expression: string;
