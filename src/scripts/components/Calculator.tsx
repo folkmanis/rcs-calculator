@@ -1,6 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
-import { CalculatorState } from '../data/calculator-state.interface';
-import { resetButton, tokensToKeyMap } from '../data/token-utilities';
+import {
+  CalculatorState,
+  INITIAL_STATE,
+} from '../data/calculator-state.interface';
+import { tokensToKeyMap } from '../data/token-utilities';
 import { InputToken } from '../data/token.interface';
 import { buttons } from '../data/tokens';
 import { processButtonClick } from '../utilities/button-actions';
@@ -35,11 +38,7 @@ function useKeyboardListener(
 }
 
 export function Calculator() {
-  const [state, setState] = useState<CalculatorState>({
-    numberInput: '0',
-    buttonStack: [resetButton],
-    tokenStack: [],
-  });
+  const [state, setState] = useState<CalculatorState>(INITIAL_STATE);
 
   const onButtonClick = (currrentButton: InputToken) => {
     const updatedState = processButtonClick(state, currrentButton);
