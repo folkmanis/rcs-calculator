@@ -16,7 +16,7 @@ export function processButtonClick(state: CalculatorState, currrentButton: Input
 
     if (currrentButton.type === 'undo') {
         const buttonStack = state.buttonStack.slice(0, -1);
-        return stateFromButtons(buttonStack);
+        return stateFromButtonStack(buttonStack);
     } else {
         state = produce(state, draft => {
             delete draft.errorState;
@@ -26,9 +26,9 @@ export function processButtonClick(state: CalculatorState, currrentButton: Input
 
 }
 
-export function stateFromButtons(buttonStack: InputToken[]): CalculatorState {
+export function stateFromButtonStack(buttonStack: InputToken[]): CalculatorState {
     return buttonStack.reduce(
-        (state, currrentButton) => processButtonClick(state, currrentButton),
+        (state, currrentButton) => updateStateAfterButtonClick(state, currrentButton),
         INITIAL_STATE
     );
 }
