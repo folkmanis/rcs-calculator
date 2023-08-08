@@ -1,4 +1,5 @@
-export type TokenType = 'reset' | "(" | ")" | "operator" | "digit" | "function" | "exec" | "number" | "undo";
+export const TOKEN_TYPES = ['reset', "(", ")", "operator", "digit", "function", "exec", "number", "undo"] as const;
+export type TokenType = typeof TOKEN_TYPES[number];
 
 export enum Associativity {
     LEFT, RIGHT

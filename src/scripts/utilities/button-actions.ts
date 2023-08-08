@@ -1,9 +1,9 @@
 import { produce } from "immer";
 import { CalculatorState, INITIAL_STATE } from '../data/calculator-state.interface';
+import { MAX_UNDO_LEVELS } from '../data/constants';
 import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../data/token.interface';
 import { evaluateTokens, last } from './math-utilities';
 import { addTokenToInput, inputToMathToken } from './number-input';
-import { resetButton } from '../data/token-utilities';
 
 
 type SequenceFn = (state: CalculatorState, currrentButton: InputToken) => CalculatorState;
@@ -12,51 +12,55 @@ type SequenceMatrix = {
     [key in InputToken['type']]: Record<string, SequenceFn>
 };
 
-export function processButtonClick(state: CalculatorState, currrentButton: InputToken): CalculatorState {
+export function processButtonClick(stateStack: CalculatorState[], currrentButton: InputToken): CalculatorState[] {
 
     if (currrentButton.type === 'undo') {
-        const buttonStack = state.buttonStack.slice(0, -1);
-        return stateFromButtonStack(buttonStack);
-    } else {
-        state = produce(state, draft => {
-            delete draft.errorState;
-        });
-        return updateStateAfterButtonClick(state, currrentButton);
+        if (stateStack.length > 1) {
+            return produce(stateStack, draft => {
+                draft.pop();
+            });
+        }
+        return stateStack;
     }
 
-}
+    const lastState = last(stateStack);
+    const { previousButton } = lastState;
+    const action = sequenceMatrix[previousButton.type]?.[currrentButton.type];
 
-export function stateFromButtonStack(buttonStack: InputToken[]): CalculatorState {
-    return buttonStack.reduce(
-        (state, currrentButton) => updateStateAfterButtonClick(state, currrentButton),
-        INITIAL_STATE
-    );
-}
-
-function updateStateAfterButtonClick(state: CalculatorState, currrentButton: InputToken): CalculatorState {
-
-    const { buttonStack } = state;
-    const previousButton: InputToken = last(buttonStack) || { type: 'reset' };
-
-    const action = currrentButton
-        && previousButton
-        && sequenceMatrix[previousButton.type]?.[currrentButton.type];
     if (typeof action === 'function') {
-        const updatedState = action(state, currrentButton);
-        return updatedState;
-    } else {
-        return state;
+
+        const updatedState = updateState(lastState, currrentButton, action);
+
+        if (updatedState !== lastState) {
+            return produce(stateStack, draft => {
+                if (stateStack.length >= MAX_UNDO_LEVELS) {
+                    draft.shift();
+                }
+                draft.push(updatedState);
+            });
+        }
     }
+
+    return stateStack;
 
 }
 
-const reset: SequenceFn = state => produce(state, draft => {
-    draft.numberInput = "0";
-    draft.buttonStack = [resetButton];
-    draft.tokenStack = [];
-    delete draft.errorState;
-    delete draft.result;
-});
+function updateState(lastState: CalculatorState, currrentButton: InputToken, sequenceFn: SequenceFn): CalculatorState {
+
+    const updatedState = sequenceFn({ ...lastState, errorState: undefined }, currrentButton);
+
+    if (updatedState === lastState) {
+        return lastState;
+    }
+
+    return produce(updatedState, draft => {
+        draft.previousButton = currrentButton;
+    });
+
+}
+
+
+const reset: SequenceFn = () => INITIAL_STATE;
 
 const calculateResult = (state: CalculatorState) => produce(state, draft => {
     try {
@@ -87,26 +91,30 @@ const calculateIntermediateResult = (state: CalculatorState) => produce(state, d
 const addTokenToState = (state: CalculatorState, currrentButton: InputToken) => produce(state, draft => {
     const button = currrentButton as MathToken & InputToken;
     draft.tokenStack.push(button);
-    draft.buttonStack.push(button);
 });
 
-const addDigitToState = (state: CalculatorState, currrentButton: InputToken) => produce(state, draft => {
-    const button = currrentButton as DigitToken;
-    draft.numberInput = addTokenToInput(draft.numberInput, button);
-    if (draft.numberInput !== state.numberInput) {
-        draft.buttonStack.push(button);
+const addDigitToState = (state: CalculatorState, currrentButton: InputToken) => {
+
+    const numberUpdate = addTokenToInput(
+        state.numberInput,
+        currrentButton as DigitToken);
+
+    if (state.numberInput !== numberUpdate) {
+        return produce(state, draft => {
+            draft.numberInput = numberUpdate;
+        });
     }
-});
+    return state;
+};
 
 // previous -> next
 const sequenceMatrix: SequenceMatrix = {
 
     'reset': {
-        'reset': reset,
         'digit': addDigitToState,
         'operator': (state, currrentButton) => produce(state, draft => {
             draft.tokenStack.push(inputToMathToken(state.numberInput));
-            draft = addTokenToState(state, currrentButton);
+            draft.tokenStack.push(currrentButton as MathToken);
         }),
         'function': addTokenToState,
         '(': addTokenToState,
@@ -118,12 +126,10 @@ const sequenceMatrix: SequenceMatrix = {
             draft.numberInput = addTokenToInput('0', button);
             draft.tokenStack = [];
             delete draft.result;
-            draft.buttonStack.push(button);
         }),
         'operator': (state, currrentButton) => produce(state, draft => {
             const button = currrentButton as OperatorToken;
             draft.tokenStack = [inputToMathToken(state.numberInput), button];
-            draft.buttonStack.push(button);
             delete draft.result;
         }),
         'function': (state, currrentButton) => {
@@ -134,19 +140,16 @@ const sequenceMatrix: SequenceMatrix = {
             });
         },
         '(': (state, currrentButton) => {
-            const button = currrentButton as OpeningBracketToken;
             const resetState = reset(state, currrentButton);
-            return produce(resetState, draft => {
-                draft.tokenStack.push(button);
-            });
+            resetState.tokenStack.push(currrentButton as OpeningBracketToken);
+            return resetState;
         },
     },
     'digit': {
         'reset': reset,
-        'exec': (state, currrentButton) => {
+        'exec': (state, _) => {
             const updatedState = produce(state, draft => {
                 draft.tokenStack.push(inputToMathToken(state.numberInput));
-                draft.buttonStack.push(currrentButton);
             });
             return calculateResult(updatedState);
         },
@@ -166,8 +169,6 @@ const sequenceMatrix: SequenceMatrix = {
 
                 const button = currrentButton as MathToken & InputToken;
                 draft.tokenStack.push(button);
-                draft.buttonStack.push(button);
-
                 draft.numberInput = "0";
 
             });
@@ -186,7 +187,6 @@ const sequenceMatrix: SequenceMatrix = {
         '(': (state, currrentButton) => produce(state, draft => {
             const button = currrentButton as MathToken & InputToken;
             draft.tokenStack.push(button);
-            draft.buttonStack.push(button);
             draft.numberInput = "0";
         }),
     },

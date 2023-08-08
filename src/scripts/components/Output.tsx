@@ -8,7 +8,7 @@ export interface OutputProps {
 }
 
 export function Output({ state }: OutputProps) {
-  const isError = state.errorState instanceof Error;
+  const isError = !!state.errorState;
   const activeValue =
     typeof state.result === 'number'
       ? state.result.toString()

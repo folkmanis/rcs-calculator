@@ -9,33 +9,33 @@ export function inputToMathToken(value: string): MathToken {
     };
 }
 
-export function addTokenToInput(value: string, token: InputToken): string {
+export function addTokenToInput(initialValue: string, token: InputToken): string {
 
-    if (value.length >= MAX_DIGITS) {
-        return value;
+    if (initialValue.length >= MAX_DIGITS) {
+        return initialValue;
     }
 
     if (token.type !== 'digit') {
-        return value;
+        return initialValue;
     }
 
     const digit = token.value;
 
     if (digit === '-') {
-        return negateInput(value);
+        return negateInput(initialValue);
     }
-    if (digit === "." && !value.includes(".")) {
-        return value + ".";
+    if (digit === "." && !initialValue.includes(".")) {
+        return initialValue + ".";
     }
     if (digit.match(/\d{1}/)) {
-        let result = value;
-        if (+value === 0 && !value.includes(".")) {
+        let result = initialValue;
+        if (+initialValue === 0 && !initialValue.includes(".")) {
             result = result.replace('0', '');
         }
         result += digit;
         return result;
     }
-    return value;
+    return initialValue;
 }
 
 export function negateInput(value: string): string {

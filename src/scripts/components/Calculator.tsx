@@ -1,11 +1,11 @@
-import { useEffect, useRef, useState } from 'react';
-import { CalculatorState } from '../data/calculator-state.interface';
+import { useEffect, useReducer, useRef } from 'react';
 import { LOCAL_STORAGE_STATE_KEY } from '../data/constants';
 import { tokensToKeyMap } from '../data/token-utilities';
 import { InputToken } from '../data/token.interface';
 import { buttons } from '../data/tokens';
 import { processButtonClick } from '../utilities/button-actions';
 import { getInitialState } from '../utilities/initial-state';
+import { last } from '../utilities/math-utilities';
 import { KeyBoard } from './Keyboard';
 import { Output } from './Output';
 
@@ -37,23 +37,24 @@ function useKeyboardListener(
 }
 
 export function Calculator() {
-  const [state, setState] = useState<CalculatorState>(getInitialState());
+  const [stateStack, dispatchToken] = useReducer(
+    processButtonClick,
+    getInitialState()
+  );
 
   useEffect(() => {
-    window.localStorage.setItem(LOCAL_STORAGE_STATE_KEY, JSON.stringify(state));
-  }, [state]);
+    window.localStorage.setItem(
+      LOCAL_STORAGE_STATE_KEY,
+      JSON.stringify(stateStack)
+    );
+  }, [stateStack]);
 
-  const onButtonClick = (currrentButton: InputToken) => {
-    const updatedState = processButtonClick(state, currrentButton);
-    setState(updatedState);
-  };
-
-  useKeyboardListener(onButtonClick, buttons);
+  useKeyboardListener(dispatchToken, buttons);
 
   return (
     <div className="h-full w-full p-2 gap-2 flex flex-col justify-between max-h-[500px] max-w-[500px] framed">
-      <Output state={state} />
-      <KeyBoard tokens={buttons} onClick={onButtonClick} />
+      <Output state={last(stateStack)} />
+      <KeyBoard tokens={buttons} onClick={dispatchToken} />
     </div>
   );
 }
