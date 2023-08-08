@@ -1,4 +1,4 @@
-import { InputToken } from '../data/token.interface';
+import { InputToken } from '../types/token.interface';
 import parse from 'html-react-parser';
 import { Ripple } from './Ripple';
 

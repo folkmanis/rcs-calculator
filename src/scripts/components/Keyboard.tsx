@@ -1,4 +1,4 @@
-import { InputToken } from '../data/token.interface';
+import { InputToken } from '../types/token.interface';
 import { Button } from './Button';
 
 export interface KeyBoardProps {

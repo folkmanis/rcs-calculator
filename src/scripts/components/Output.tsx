@@ -1,7 +1,7 @@
-import { MathToken } from '../data/token.interface';
+import { MathToken } from '../types/token.interface';
 import { OutputActiveValue } from './OutputActiveValue';
 import { OutputExpression } from './OutputExpression';
-import { CalculatorState } from '../data/calculator-state.interface';
+import { CalculatorState } from '../types/calculator-state.interface';
 
 export interface OutputProps {
   state: CalculatorState;

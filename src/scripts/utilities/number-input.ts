@@ -1,4 +1,4 @@
-import { InputToken, MathToken } from '../data/token.interface';
+import { InputToken, MathToken } from '../types/token.interface';
 import { MAX_DIGITS } from '../data/constants';
 
 export function inputToMathToken(value: string): MathToken {
@@ -44,4 +44,17 @@ export function negateInput(value: string): string {
     } else {
         return '-' + value;
     }
+}
+
+
+// TODO - refactor to fine-tune output
+export function inputStringToDisplay(value: string): string {
+    let output = value.toString();
+    if (output.length > MAX_DIGITS && output.includes('.')) {
+        output = (+output).toPrecision(MAX_DIGITS - 2);
+    }
+
+    output = output.replace('.', ',');
+
+    return output;
 }

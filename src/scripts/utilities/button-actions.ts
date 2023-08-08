@@ -1,7 +1,7 @@
 import { produce } from "immer";
-import { CalculatorState, INITIAL_STATE } from '../data/calculator-state.interface';
+import { CalculatorState, INITIAL_STATE } from '../types/calculator-state.interface';
 import { MAX_UNDO_LEVELS } from '../data/constants';
-import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../data/token.interface';
+import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../types/token.interface';
 import { evaluateTokens, last } from './math-utilities';
 import { addTokenToInput, inputToMathToken } from './number-input';
 

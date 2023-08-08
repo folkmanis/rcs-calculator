@@ -1,5 +1,5 @@
-import { InputToken } from './token.interface';
-import { buttons } from './tokens';
+import { InputToken } from '../types/token.interface';
+import { buttons } from '../data/tokens';
 
 export function tokensToKeyMap(tokens: InputToken[]): Map<string, InputToken> {
     const keyMap = new Map<string, InputToken>();

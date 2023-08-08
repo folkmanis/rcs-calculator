@@ -1,4 +1,4 @@
-import { InputToken } from './token.interface';
+import { InputToken } from '../types/token.interface';
 
 export const buttons: InputToken[] = [
     {

@@ -1,4 +1,4 @@
-import './ripple.css';
+import '../../styles/ripple.css';
 import { MouseEventHandler, useLayoutEffect, useState } from 'react';
 
 interface RippleStyle {

@@ -1,4 +1,4 @@
-import { FunctionToken, MathToken, NumberToken, OperatorToken } from '../data/token.interface';
+import { FunctionToken, MathToken, NumberToken, OperatorToken } from '../types/token.interface';
 
 type TokenActions = {
     [key in 'number' | 'function' | 'operator' | '(' | ')']:

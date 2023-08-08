@@ -1,4 +1,4 @@
-import { CalculatorState, INITIAL_STATE, calculatorStackSchema } from '../data/calculator-state.interface';
+import { CalculatorState, INITIAL_STATE, calculatorStackSchema } from '../types/calculator-state.interface';
 import { LOCAL_STORAGE_STATE_KEY } from '../data/constants';
 import Joi from 'joi';
 

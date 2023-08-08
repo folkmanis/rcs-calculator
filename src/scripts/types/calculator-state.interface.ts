@@ -1,4 +1,4 @@
-import { resetButton } from './token-utilities';
+import { resetButton } from '../utilities/token-utilities';
 import { InputToken, MathToken, TOKEN_TYPES } from './token.interface';
 import Joi from "joi";
 
