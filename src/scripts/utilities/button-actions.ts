@@ -1,4 +1,4 @@
-import { produce } from "immer";
+import { produce } from 'immer';
 import { CalculatorState, INITIAL_STATE } from '../types/calculator-state.interface';
 import { MAX_UNDO_LEVELS } from '../data/constants';
 import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../types/token.interface';
@@ -24,6 +24,9 @@ export function processButtonClick(stateStack: CalculatorState[], currrentButton
     }
 
     const lastState = last(stateStack);
+    if (lastState === undefined) {
+        return stateStack;
+    }
     const { previousButton } = lastState;
     const action = sequenceMatrix[previousButton.type]?.[currrentButton.type];
 
@@ -169,7 +172,7 @@ const sequenceMatrix: SequenceMatrix = {
 
                 const button = currrentButton as MathToken & InputToken;
                 draft.tokenStack.push(button);
-                draft.numberInput = "0";
+                draft.numberInput = '0';
 
             });
             return calculateIntermediateResult(updatedState);
@@ -187,7 +190,7 @@ const sequenceMatrix: SequenceMatrix = {
         '(': (state, currrentButton) => produce(state, draft => {
             const button = currrentButton as MathToken & InputToken;
             draft.tokenStack.push(button);
-            draft.numberInput = "0";
+            draft.numberInput = '0';
         }),
     },
     'function': {
@@ -220,5 +223,3 @@ const sequenceMatrix: SequenceMatrix = {
     },
     'undo': {},
 };
-
-

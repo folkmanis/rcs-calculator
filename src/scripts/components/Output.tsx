@@ -1,16 +1,15 @@
-import { MathToken } from '../types/token.interface';
+import { CalculatorState } from '../types/calculator-state.interface';
 import { OutputActiveValue } from './OutputActiveValue';
 import { OutputExpression } from './OutputExpression';
-import { CalculatorState } from '../types/calculator-state.interface';
 
 export interface OutputProps {
   state: CalculatorState;
 }
 
 export function Output({ state }: OutputProps) {
-  const isError = !!state.errorState;
-  const activeValue =
-    typeof state.result === 'number'
+  const isError = !(state.errorState == null);
+  const activeValue
+    = typeof state.result === 'number'
       ? state.result.toString()
       : state.numberInput;
   let expression = state.tokenStack.map(token => token.html).join(' ');

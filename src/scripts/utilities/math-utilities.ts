@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { FunctionToken, MathToken, NumberToken, OperatorToken } from '../types/token.interface';
 
 type TokenActions = {
@@ -7,7 +8,7 @@ type TokenActions = {
 
 type RpnTokens = NumberToken | OperatorToken | FunctionToken;
 
-export const last = <T>(arr: T[]) => arr[arr.length - 1];
+export const last = <T>(arr: T[]): T | undefined => arr[arr.length - 1];
 
 export function evaluateTokens(tokens: MathToken[]): number {
 
@@ -24,8 +25,7 @@ const tokenActions: TokenActions = {
     'operator': (operatorStack, outputStack, token) => {
         token = token as OperatorToken;
         while (
-            last(operatorStack)
-            && last(operatorStack).type === 'operator'
+            last(operatorStack)?.type === 'operator'
             && ((last(operatorStack) as OperatorToken).precedence > token.precedence
                 || (
                     (last(operatorStack) as OperatorToken).precedence === token.precedence
@@ -33,6 +33,7 @@ const tokenActions: TokenActions = {
                 )
             )
         ) {
+            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
             outputStack.push(operatorStack.pop()!);
         }
         operatorStack.push(token);
@@ -42,14 +43,14 @@ const tokenActions: TokenActions = {
         if (operatorStack.length === 0) {
             throw new Error('Invalid expression. Parentheses mismatch');
         }
-        while (last(operatorStack).type !== '(') {
+        while (last(operatorStack)?.type !== '(') {
             outputStack.push(operatorStack.pop()!);
             if (operatorStack.length === 0) {
                 throw new Error('Invalid expression. Parentheses mismatch');
             }
         }
         operatorStack.pop();
-        if (last(operatorStack) && last(operatorStack).type === 'function') {
+        if (last(operatorStack)?.type === 'function') {
             outputStack.push(operatorStack.pop()!);
         }
     },
@@ -67,7 +68,7 @@ const rpnOperatorActions: RpnActions = {
     'function': (stack, token) => {
         const arg = stack.pop()!;
         stack.push((token as FunctionToken).callback(arg));
-    }
+    },
 };
 
 
@@ -76,7 +77,7 @@ export function tokensToRpnStack(tokens: MathToken[]): RpnTokens[] {
     const operatorStack: MathToken[] = [];
     const outputStack: RpnTokens[] = [];
 
-    tokens.forEach(token => tokenActions[token.type](operatorStack, outputStack, token));
+    tokens.forEach(token => { tokenActions[token.type](operatorStack, outputStack, token); });
 
     if (operatorStack.some(token => token.type === '(')) {
         throw new Error('Invalid expression. Parentheses mismatch');
@@ -95,12 +96,11 @@ function assertIsRpnStack(tokens: MathToken[]): asserts tokens is RpnTokens[] {
 }
 
 
-
 export function rpnStackToResult(tokens: RpnTokens[]): number {
     return tokens
-        .reduce((stack, token) => {
+        .reduce<number[]>((stack, token) => {
             rpnOperatorActions[token.type](stack, token);
             return stack;
-        }, [] as number[])
+        }, [])
         .pop()!;
 }

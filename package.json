@@ -4,9 +4,13 @@
   "description": "Simple calculator",
   "source": "src/index.html",
   "scripts": {
-    "start": "parcel",
+    "prebuild": "run-s clean",
+    "start": "parcel --public-url /",
     "build": "parcel build --public-url /calculator",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "clean": "rimraf ./dist ./parcel-cache",
+    "lint": "eslint --ext ts,tsx src",
+    "lint-fix": "eslint --ext ts,tsx src --fix"
   },
   "author": "Edmunds",
   "license": "ISC",
@@ -22,8 +26,19 @@
   "devDependencies": {
     "@types/react": "^18.2.17",
     "@types/react-dom": "^18.2.7",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "eslint": "^8.46.0",
+    "eslint-config-standard-with-typescript": "^37.0.0",
+    "eslint-plugin-import": "^2.28.0",
+    "eslint-plugin-n": "^16.0.1",
+    "eslint-plugin-promise": "^6.1.1",
+    "eslint-plugin-react": "^7.33.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "npm-run-all": "^4.1.5",
     "postcss": "^8.4.26",
     "process": "^0.11.10",
-    "tailwindcss": "^3.3.3"
+    "rimraf": "^5.0.1",
+    "tailwindcss": "^3.3.3",
+    "typescript": "^5.1.6"
   }
 }

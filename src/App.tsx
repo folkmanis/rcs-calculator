@@ -1,7 +1,6 @@
-import React from 'react';
+import React, { StrictMode } from 'react';
 import { Calculator } from './scripts/components/Calculator';
 import './styles.css';
-import { StrictMode } from 'react';
 
 export function App() {
   return (

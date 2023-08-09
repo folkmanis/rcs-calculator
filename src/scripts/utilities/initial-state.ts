@@ -1,16 +1,15 @@
-import { CalculatorState, INITIAL_STATE, calculatorStackSchema } from '../types/calculator-state.interface';
 import { LOCAL_STORAGE_STATE_KEY } from '../data/constants';
-import Joi from 'joi';
+import { CalculatorState, INITIAL_STATE, calculatorStackSchema } from '../types/calculator-state.interface';
 
 
 export function getInitialState(): CalculatorState[] {
 
     const saved = window.localStorage.getItem(LOCAL_STORAGE_STATE_KEY);
 
-    if (saved) {
-        const parsed = JSON.parse(saved);
+    if (typeof saved === 'string') {
+        const parsed: unknown = JSON.parse(saved);
         const { error, value } = calculatorStackSchema.validate(parsed);
-        if (!error && value != undefined) {
+        if ((error == null) && value !== undefined) {
             return value;
         }
         window.localStorage.removeItem(LOCAL_STORAGE_STATE_KEY);

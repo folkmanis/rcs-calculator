@@ -24,12 +24,12 @@ export function addTokenToInput(initialValue: string, token: InputToken): string
     if (digit === '-') {
         return negateInput(initialValue);
     }
-    if (digit === "." && !initialValue.includes(".")) {
-        return initialValue + ".";
+    if (digit === '.' && !initialValue.includes('.')) {
+        return initialValue + '.';
     }
-    if (digit.match(/\d{1}/)) {
+    if (digit.match(/\d{1}/) != null) {
         let result = initialValue;
-        if (+initialValue === 0 && !initialValue.includes(".")) {
+        if (+initialValue === 0 && !initialValue.includes('.')) {
             result = result.replace('0', '');
         }
         result += digit;

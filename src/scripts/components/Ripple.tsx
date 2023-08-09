@@ -18,7 +18,7 @@ export function Ripple() {
         clearTimeout(timeoutId);
       }, 300 * 5);
     }
-    return () => clearTimeout(timeoutId);
+    return () => { clearTimeout(timeoutId); };
   }, [rippleArray]);
 
   const addRipple: MouseEventHandler<HTMLDivElement> = event => {

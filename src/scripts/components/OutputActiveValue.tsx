@@ -1,4 +1,4 @@
-import { MAX_DIGITS, ERROR_TEXT } from '../data/constants';
+import { ERROR_TEXT } from '../data/constants';
 import { inputStringToDisplay } from '../utilities/number-input';
 
 export interface OutputActiveValueProps {

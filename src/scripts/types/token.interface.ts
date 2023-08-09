@@ -1,4 +1,4 @@
-export const TOKEN_TYPES = ['reset', "(", ")", "operator", "digit", "function", "exec", "number", "undo"] as const;
+export const TOKEN_TYPES = ['reset', '(', ')', 'operator', 'digit', 'function', 'exec', 'number', 'undo'] as const;
 export type TokenType = typeof TOKEN_TYPES[number];
 
 export enum Associativity {
@@ -6,56 +6,56 @@ export enum Associativity {
 }
 
 export interface TokenBase {
-    type: TokenType,
+    type: TokenType;
 }
 
 export interface ButtonToken extends TokenBase {
-    html: string,
-    keycodes?: string[],
-    styles?: string[],
+    html: string;
+    keycodes?: string[];
+    styles?: string[];
 }
 
 export interface OperatorToken extends ButtonToken {
-    type: "operator",
-    precedence: number,
-    associativity: Associativity,
-    callback: (a: number, b: number) => number,
+    type: 'operator';
+    precedence: number;
+    associativity: Associativity;
+    callback: (a: number, b: number) => number;
 }
 
 export interface FunctionToken extends ButtonToken {
-    type: "function",
-    callback: (a: number) => number,
+    type: 'function';
+    callback: (a: number) => number;
 }
 
 export interface DigitToken extends ButtonToken {
-    type: 'digit',
-    value: string,
+    type: 'digit';
+    value: string;
 }
 
 export interface OpeningBracketToken extends ButtonToken {
-    type: '(',
+    type: '(';
 }
 
 export interface ClosingBracketToken extends ButtonToken {
-    type: ')',
+    type: ')';
 }
 
 export interface ExecToken extends ButtonToken {
-    type: 'exec',
+    type: 'exec';
 }
 
 export interface ResetToken extends ButtonToken {
-    type: 'reset',
+    type: 'reset';
 }
 
 export interface NumberToken extends TokenBase {
-    type: 'number',
-    value: number,
-    html: string,
+    type: 'number';
+    value: number;
+    html: string;
 }
 
 export interface UndoToken extends ButtonToken {
-    type: 'undo',
+    type: 'undo';
 }
 
 export type InputToken = OperatorToken | FunctionToken | DigitToken | OpeningBracketToken | ClosingBracketToken | ExecToken | ResetToken | UndoToken;
