@@ -1,28 +1,27 @@
 import { useEffect, useRef } from 'react';
-import { InputToken } from '../types/token.interface';
 import { tokensToKeyMap } from '../utilities/token-utilities';
-
-const noop = (): void => { };
+import { tokens } from '../data/tokens';
+import { ButtonClickEvent } from '../types/button-click-event';
 
 export function useKeyboardListener(
-    handler: (ev: InputToken) => void,
-    inputTokens: InputToken[]
+    inputTokenIds: Array<keyof typeof tokens>,
+    inputHandler: (event: ButtonClickEvent) => void
 ): void {
-    const savedHandler = useRef<(ev: KeyboardEvent) => void>(noop);
+    const savedHandler = useRef<(ev: KeyboardEvent) => void>();
 
     useEffect(() => {
-        const keyMap = tokensToKeyMap(inputTokens);
+        const keyMap = tokensToKeyMap(inputTokenIds);
         savedHandler.current = (ev: KeyboardEvent) => {
-            const token = keyMap.get(ev.key);
-            if (token != null) {
+            const buttonId = keyMap.get(ev.key);
+            if (buttonId !== undefined) {
                 ev.preventDefault();
-                handler(token);
+                inputHandler({ buttonId });
             }
         };
-    }, [handler, inputTokens]);
+    }, [inputTokenIds, inputHandler]);
 
     useEffect(() => {
-        const eventListener = (ev: KeyboardEvent) => { savedHandler.current(ev); };
+        const eventListener = (ev: KeyboardEvent) => { savedHandler.current?.(ev); };
         document.addEventListener('keydown', eventListener);
 
         return () => {

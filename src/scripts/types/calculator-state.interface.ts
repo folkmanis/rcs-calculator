@@ -1,4 +1,4 @@
-import { resetButton } from '../utilities/token-utilities';
+import { tokens } from '../data/tokens';
 import { InputToken, MathToken, TOKEN_TYPES } from './token.interface';
 import Joi from 'joi';
 
@@ -30,6 +30,6 @@ export const calculatorStackSchema = Joi.array<CalculatorState[]>().items(calcul
 
 export const INITIAL_STATE: CalculatorState = {
     numberInput: '0',
-    previousButton: resetButton,
+    previousButton: tokens.reset,
     tokenStack: [],
 };

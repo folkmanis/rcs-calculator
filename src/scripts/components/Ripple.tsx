@@ -1,41 +1,35 @@
+import { useRef } from 'react';
 import '../../styles/ripple.css';
-import { MouseEventHandler, useLayoutEffect, useState } from 'react';
+import { RippleStyle } from '../types/ripple-style';
+import { RipplePosition } from '../types/ripple-position';
 
-interface RippleStyle {
-  width: string;
-  height: string;
-  left: string;
-  top: string;
+interface RippleProps {
+  ripples: RipplePosition[];
 }
-export function Ripple() {
-  const [rippleArray, setRippleArray] = useState<RippleStyle[]>([]);
 
-  useLayoutEffect(() => {
-    let timeoutId: number | undefined;
-    if (rippleArray.length > 0) {
-      timeoutId = setTimeout(() => {
-        setRippleArray([]);
-        clearTimeout(timeoutId);
-      }, 300 * 5);
-    }
-    return () => { clearTimeout(timeoutId); };
-  }, [rippleArray]);
+export function Ripple({ ripples }: RippleProps) {
+  const rippleArray: RippleStyle[] = [];
+  const containerRef = useRef<HTMLDivElement>(null);
 
-  const addRipple: MouseEventHandler<HTMLDivElement> = event => {
-    const element = event.currentTarget.getBoundingClientRect();
+  const element = containerRef.current?.getBoundingClientRect();
+  if (element !== undefined) {
     const diameter = Math.max(element.width, element.height);
     const radius = diameter / 2;
-    const newRipple: RippleStyle = {
-      width: `${diameter}px`,
-      height: `${diameter}px`,
-      left: `${event.clientX - (element.x + radius)}px`,
-      top: `${event.clientY - (element.y + radius)}px`,
-    };
-    setRippleArray([...rippleArray, newRipple]);
-  };
+    ripples.forEach(ripple => {
+      const clientX = ripple.clientX ?? element.x + element.width / 2;
+      const clientY = ripple.clientY ?? element.y + element.height / 2;
+      const newRipple: RippleStyle = {
+        width: `${diameter}px`,
+        height: `${diameter}px`,
+        left: `${clientX - (element.x + radius)}px`,
+        top: `${clientY - (element.y + radius)}px`,
+      };
+      rippleArray.push(newRipple);
+    });
+  }
 
   return (
-    <div className="ripple-container" onMouseDown={addRipple}>
+    <div className="ripple-container" ref={containerRef}>
       {rippleArray.map((ripple, idx) => (
         <span key={idx} style={ripple}></span>
       ))}

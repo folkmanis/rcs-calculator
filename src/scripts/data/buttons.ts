@@ -1,0 +1,28 @@
+import { tokens } from './tokens';
+
+export const buttons: Array<keyof typeof tokens> = [
+    'undo',
+    'sin',
+    'cos',
+    'tan',
+    'reset',
+    'openingBracket',
+    'closingBracket',
+    'div',
+    'digit7',
+    'digit8',
+    'digit9',
+    'multiplication',
+    'digit4',
+    'digit5',
+    'digit6',
+    'minus',
+    'digit1',
+    'digit2',
+    'digit3',
+    'plus',
+    'negate',
+    'digit0',
+    'point',
+    'exec',
+];

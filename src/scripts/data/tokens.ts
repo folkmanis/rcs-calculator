@@ -1,42 +1,42 @@
 import { InputToken } from '../types/token.interface';
 
-export const buttons: InputToken[] = [
-    {
+export const tokens: Record<string, InputToken> = {
+    undo: {
         type: 'undo',
         html: '&#x232b;',
     },
-    {
+    sin: {
         type: 'function',
         html: 'sin',
         callback: a => Math.sin(a),
     },
-    {
+    cos: {
         type: 'function',
         html: 'cos',
         callback: a => Math.cos(a),
     },
-    {
+    tan: {
         type: 'function',
         html: 'tan',
         callback: a => Math.tan(a),
     },
-    {
+    reset: {
         type: 'reset',
         html: 'C',
         keycodes: ['C', 'c', 'Escape'],
         styles: ['bg-red-300', 'text-white'],
     },
-    {
+    openingBracket: {
         type: '(',
         html: '(',
         keycodes: ['('],
     },
-    {
+    closingBracket: {
         type: ')',
         html: ')',
         keycodes: [')'],
     },
-    {
+    div: {
         type: 'operator',
         html: '&div;',
         keycodes: ['/'],
@@ -44,28 +44,28 @@ export const buttons: InputToken[] = [
         associativity: 0,
         callback: (a, b) => a / b,
     },
-    {
+    digit7: {
         type: 'digit',
         html: '7',
         value: '7',
         keycodes: ['7'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit8: {
         type: 'digit',
         html: '8',
         value: '8',
         keycodes: ['8'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit9: {
         type: 'digit',
         html: '9',
         value: '9',
         keycodes: ['9'],
         styles: ['bg-gray-100'],
     },
-    {
+    multiplication: {
         type: 'operator',
         html: '&times;',
         keycodes: ['*'],
@@ -73,28 +73,28 @@ export const buttons: InputToken[] = [
         associativity: 0,
         callback: (a, b) => a * b,
     },
-    {
+    digit4: {
         type: 'digit',
         html: '4',
         value: '4',
         keycodes: ['4'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit5: {
         type: 'digit',
         html: '5',
         value: '5',
         keycodes: ['5'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit6: {
         type: 'digit',
         html: '6',
         keycodes: ['6'],
         value: '6',
         styles: ['bg-gray-100'],
     },
-    {
+    minus: {
         type: 'operator',
         html: '&minus;',
         keycodes: ['-'],
@@ -102,28 +102,28 @@ export const buttons: InputToken[] = [
         associativity: 0,
         callback: (a, b) => a - b,
     },
-    {
+    digit1: {
         type: 'digit',
         html: '1',
         value: '1',
         keycodes: ['1'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit2: {
         type: 'digit',
         html: '2',
         value: '2',
         keycodes: ['2'],
         styles: ['bg-gray-100'],
     },
-    {
+    digit3: {
         type: 'digit',
         html: '3',
         keycodes: ['3'],
         value: '3',
         styles: ['bg-gray-100'],
     },
-    {
+    plus: {
         type: 'operator',
         html: '&plus;',
         keycodes: ['+'],
@@ -131,28 +131,28 @@ export const buttons: InputToken[] = [
         associativity: 0,
         callback: (a, b) => a + b,
     },
-    {
+    negate: {
         type: 'digit',
         html: '&pm;',
         value: '-',
     },
-    {
+    digit0: {
         type: 'digit',
         html: '0',
         value: '0',
         keycodes: ['0'],
         styles: ['bg-gray-100'],
     },
-    {
+    point: {
         type: 'digit',
         html: ',',
         value: '.',
         keycodes: ['.', ','],
     },
-    {
+    exec: {
         type: 'exec',
         html: '&equals;',
         keycodes: ['=', 'Enter'],
         // styles: ['row-span-2'],
     },
-];
+};
