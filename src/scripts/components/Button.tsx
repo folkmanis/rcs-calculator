@@ -3,13 +3,13 @@ import { MouseEventHandler } from 'react';
 import { BUTTON_ID_PREFIX } from '../data/constants';
 import { tokens } from '../data/tokens';
 import { Ripple } from './Ripple';
-import { RipplePosition } from '../types/ripple-position';
+import { ActiveRipple } from '../types/active-ripple';
 import { ButtonClickEvent } from '../types/button-click-event';
 
 export interface ButtonProps {
   tokenName: keyof typeof tokens;
   onClick: (event: ButtonClickEvent) => void;
-  ripples: RipplePosition[];
+  ripples: ActiveRipple[];
 }
 
 export function Button({ tokenName, onClick, ripples }: ButtonProps) {

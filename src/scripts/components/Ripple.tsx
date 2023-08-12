@@ -1,10 +1,10 @@
 import { useRef } from 'react';
 import '../../styles/ripple.css';
 import { RippleStyle } from '../types/ripple-style';
-import { RipplePosition } from '../types/ripple-position';
+import { ActiveRipple } from '../types/active-ripple';
 
 interface RippleProps {
-  ripples: RipplePosition[];
+  ripples: ActiveRipple[];
 }
 
 export function Ripple({ ripples }: RippleProps) {

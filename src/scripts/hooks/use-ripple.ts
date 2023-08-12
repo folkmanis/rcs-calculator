@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react';
-import { ButtonClickEvent as ActiveRipple } from '../types/button-click-event';
+import { ActiveRipple } from '../types/active-ripple';
 
 export function useRipple(): [ActiveRipple[], (ripple: ActiveRipple) => void] {
     const [rippleArray, setRippleArray] = useState<ActiveRipple[]>([]);
