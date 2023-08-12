@@ -1,13 +1,12 @@
 import { tokens } from '../data/tokens';
 import { useKeyboardListener } from '../hooks/use-keyboard-listener';
 import { useRipple } from '../hooks/use-ripple';
-import { InputToken } from '../types/token.interface';
-import { Button } from './Button';
 import { ButtonClickEvent } from '../types/button-click-event';
+import { Button } from './Button';
 
 export interface KeyBoardProps {
   tokenNames: Array<keyof typeof tokens>;
-  onClick: (token: InputToken) => void;
+  onClick: (buttonId: string) => void;
 }
 
 export function KeyBoard({ tokenNames, onClick }: KeyBoardProps) {
@@ -16,7 +15,7 @@ export function KeyBoard({ tokenNames, onClick }: KeyBoardProps) {
   const [ripples, addRipple] = useRipple();
 
   function clickHandler(event: ButtonClickEvent) {
-    onClick(tokens[event.buttonId]);
+    onClick(event.buttonId);
     addRipple(event);
   }
 

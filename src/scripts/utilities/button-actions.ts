@@ -4,6 +4,7 @@ import { MAX_UNDO_LEVELS } from '../data/constants';
 import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../types/token.interface';
 import { evaluateTokens, last } from './math-utilities';
 import { addTokenToInput, inputToMathToken } from './number-input';
+import { tokens } from '../data/tokens';
 
 
 type SequenceFn = (state: CalculatorState, currrentButton: InputToken) => CalculatorState;
@@ -12,8 +13,12 @@ type SequenceMatrix = {
     [key in InputToken['type']]: Record<string, SequenceFn>
 };
 
-export function processButtonClick(stateStack: CalculatorState[], currrentButton: InputToken): CalculatorState[] {
+export function processButtonClick(
+    stateStack: CalculatorState[],
+    buttonId: string
+): CalculatorState[] {
 
+    const currrentButton = tokens[buttonId];
     if (currrentButton.type === 'undo') {
         if (stateStack.length > 1) {
             return produce(stateStack, draft => {

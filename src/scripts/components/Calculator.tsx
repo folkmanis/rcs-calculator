@@ -8,7 +8,7 @@ import { KeyBoard } from './Keyboard';
 import { Output } from './Output';
 
 export function Calculator() {
-  const [stateStack, dispatchToken] = useReducer(
+  const [stateStack, dispatchButtonId] = useReducer(
     processButtonClick,
     getInitialState()
   );
@@ -23,7 +23,7 @@ export function Calculator() {
   return (
     <div className="h-full w-full p-2 gap-2 flex flex-col justify-between max-h-[500px] max-w-[500px] framed">
       <Output state={lastStateOrDefault(stateStack)} />
-      <KeyBoard tokenNames={buttons} onClick={dispatchToken} />
+      <KeyBoard tokenNames={buttons} onClick={dispatchButtonId} />
     </div>
   );
 }
