@@ -1,25 +1,41 @@
-import { useLayoutEffect, useState } from 'react';
-import { ActiveRipple } from '../types/active-ripple';
+import { useLayoutEffect, useMemo, useState } from 'react';
+import { RippleEvent } from '../types/ripple-event';
+import { RippleStyle } from '../types/ripple-style';
+import { calculateRipplePosition } from '../utilities/calculate-ripple-position';
 
-export function useRipple(): [ActiveRipple[], (ripple: ActiveRipple) => void] {
-    const [rippleArray, setRippleArray] = useState<ActiveRipple[]>([]);
+export function useRipple(
+    containerRef: HTMLDivElement | null
+): [RippleStyle[], (event?: RippleEvent) => void] {
+    const [rippleEvents, setRippleEvents] = useState<RippleEvent[]>([]);
 
     useLayoutEffect(() => {
         let timeoutId: number | undefined;
-        if (rippleArray.length > 0) {
+        if (rippleEvents.length > 0) {
             timeoutId = setTimeout(() => {
-                setRippleArray([]);
+                setRippleEvents([]);
                 clearTimeout(timeoutId);
             }, 300 * 5);
         }
         return () => {
             clearTimeout(timeoutId);
         };
-    }, [rippleArray]);
+    }, [rippleEvents]);
 
-    const addRipple: (ripple: ActiveRipple) => void = ripple => {
-        setRippleArray([...rippleArray, ripple]);
+    const addRipple: (event?: RippleEvent) => void = event => {
+        setRippleEvents([...rippleEvents, event ?? {}]);
     };
+
+    const rippleArray = useMemo<RippleStyle[]>(() => {
+        if (containerRef !== null) {
+            const element = containerRef.getBoundingClientRect();
+            return rippleEvents.map(ripple =>
+                calculateRipplePosition(element, ripple)
+            );
+        } else {
+            return [];
+        }
+
+    }, [containerRef, rippleEvents]);
 
     return [rippleArray, addRipple];
 }

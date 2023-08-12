@@ -1,9 +1,9 @@
-import { ActiveRipple } from '../types/active-ripple';
+import { RippleEvent } from '../types/ripple-event';
 import { RippleStyle } from '../types/ripple-style';
 
 export function calculateRipplePosition(
     container: DOMRect,
-    ripple: ActiveRipple
+    ripple: RippleEvent
 ): RippleStyle {
     const diameter = Math.max(container.width, container.height);
     const radius = diameter / 2;

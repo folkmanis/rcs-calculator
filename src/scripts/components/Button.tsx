@@ -1,37 +1,44 @@
 import parse from 'html-react-parser';
-import { MouseEventHandler } from 'react';
+import {
+  ElementRef,
+  MouseEventHandler,
+  forwardRef,
+  useImperativeHandle,
+  useRef,
+} from 'react';
 import { BUTTON_ID_PREFIX } from '../data/constants';
 import { tokens } from '../data/tokens';
-import { Ripple } from './Ripple';
-import { ActiveRipple } from '../types/active-ripple';
-import { ButtonClickEvent } from '../types/button-click-event';
+import { Ripple, RippleHandle } from './Ripple';
 
 export interface ButtonProps {
   tokenName: keyof typeof tokens;
-  onClick: (event: ButtonClickEvent) => void;
-  ripples: ActiveRipple[];
+  onClick: MouseEventHandler<HTMLButtonElement>;
 }
 
-export function Button({ tokenName, onClick, ripples }: ButtonProps) {
-  const token = tokens[tokenName];
-  const elementId = BUTTON_ID_PREFIX + tokenName;
-  const classes = ['framed', 'key-button', ...(token.styles ?? [])].join(' ');
+export interface ButtonHandle {
+  ripple: RippleHandle | null;
+}
 
-  const clickHandler: MouseEventHandler<HTMLButtonElement> = ev => {
-    ev.stopPropagation();
-    onClick({
-      buttonId: tokenName,
-      clientX: ev.clientX,
-      clientY: ev.clientY,
-    });
-  };
+export const Button = forwardRef<ButtonHandle, ButtonProps>(function Button(
+  { tokenName, onClick }: ButtonProps,
+  ref
+) {
+  const rippleRef = useRef<ElementRef<typeof Ripple>>(null);
+
+  useImperativeHandle(ref, () => ({
+    ripple: rippleRef.current,
+  }));
+
+  const { styles, html } = tokens[tokenName];
+  const elementId = BUTTON_ID_PREFIX + tokenName;
+  const classes = ['framed', 'key-button', ...(styles ?? [])].join(' ');
 
   return (
     <div className={classes} id={elementId}>
-      <button onClick={clickHandler}>
-        {parse(token.html)}
-        <Ripple ripples={ripples} />
+      <button onClick={onClick}>
+        {parse(html)}
+        <Ripple ref={rippleRef} />
       </button>
     </div>
   );
-}
+});

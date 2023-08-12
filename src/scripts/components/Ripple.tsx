@@ -1,23 +1,23 @@
-import { useRef } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
 import '../../styles/ripple.css';
-import { RippleStyle } from '../types/ripple-style';
-import { ActiveRipple } from '../types/active-ripple';
-import { calculateRipplePosition } from '../utilities/calculate-ripple-position';
+import { useRipple } from '../hooks/use-ripple';
+import { RippleEvent } from '../types/ripple-event';
 
-interface RippleProps {
-  ripples: ActiveRipple[];
+export interface RippleHandle {
+  addRipple: (event?: RippleEvent) => void;
 }
 
-export function Ripple({ ripples }: RippleProps) {
+export const Ripple = forwardRef<RippleHandle, unknown>(function Ripple(
+  _,
+  ref
+) {
   const containerRef = useRef<HTMLDivElement>(null);
 
-  let rippleArray: RippleStyle[] = [];
-  if (containerRef.current !== null) {
-    const element = containerRef.current.getBoundingClientRect();
-    rippleArray = ripples.map(ripple =>
-      calculateRipplePosition(element, ripple)
-    );
-  }
+  const [rippleArray, addRipple] = useRipple(containerRef.current);
+
+  useImperativeHandle(ref, () => ({
+    addRipple,
+  }));
 
   return (
     <div className="ripple-container" ref={containerRef}>
@@ -26,4 +26,4 @@ export function Ripple({ ripples }: RippleProps) {
       ))}
     </div>
   );
-}
+});

@@ -1,11 +1,10 @@
 import { useEffect, useRef } from 'react';
 import { tokensToKeyMap } from '../utilities/token-utilities';
 import { tokens } from '../data/tokens';
-import { ButtonClickEvent } from '../types/button-click-event';
 
 export function useKeyboardListener(
     inputTokenIds: Array<keyof typeof tokens>,
-    inputHandler: (event: ButtonClickEvent) => void
+    inputHandler: (buttonId: string) => void
 ): void {
     const savedHandler = useRef<(ev: KeyboardEvent) => void>();
 
@@ -15,7 +14,7 @@ export function useKeyboardListener(
             const buttonId = keyMap.get(ev.key);
             if (buttonId !== undefined) {
                 ev.preventDefault();
-                inputHandler({ buttonId });
+                inputHandler(buttonId);
             }
         };
     }, [inputTokenIds, inputHandler]);

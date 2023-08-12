@@ -1,8 +1,8 @@
+import { useRef } from 'react';
 import { tokens } from '../data/tokens';
 import { useKeyboardListener } from '../hooks/use-keyboard-listener';
-import { useRipple } from '../hooks/use-ripple';
-import { ButtonClickEvent } from '../types/button-click-event';
-import { Button } from './Button';
+import { Button, ButtonHandle } from './Button';
+import { RippleEvent } from '../types/ripple-event';
 
 export interface KeyBoardProps {
   tokenNames: Array<keyof typeof tokens>;
@@ -10,25 +10,23 @@ export interface KeyBoardProps {
 }
 
 export function KeyBoard({ tokenNames, onClick }: KeyBoardProps) {
-  useKeyboardListener(tokenNames, clickHandler);
-
-  const [ripples, addRipple] = useRipple();
-
-  function clickHandler(event: ButtonClickEvent) {
-    onClick(event.buttonId);
-    addRipple(event);
+  function clickEventHandler(buttonId: string, ev?: RippleEvent) {
+    buttonsRef.current.get(buttonId)?.ripple?.addRipple(ev);
+    onClick(buttonId);
   }
+  useKeyboardListener(tokenNames, clickEventHandler);
+  const buttonsRef = useRef<Map<string, ButtonHandle | null>>(new Map());
 
-  const buttons = tokenNames.map(tokenName => {
-    return (
-      <Button
-        key={tokenName}
-        tokenName={tokenName}
-        onClick={clickHandler}
-        ripples={ripples.filter(ripple => ripple.buttonId === tokenName)}
-      />
-    );
-  });
+  const buttons = tokenNames.map(tokenName => (
+    <Button
+      key={tokenName}
+      tokenName={tokenName}
+      onClick={ev => {
+        clickEventHandler(tokenName, ev);
+      }}
+      ref={el => buttonsRef.current.set(tokenName, el)}
+    />
+  ));
 
   return (
     <div
