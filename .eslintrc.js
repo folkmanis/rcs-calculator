@@ -52,7 +52,7 @@ module.exports = {
         "@typescript-eslint/comma-dangle": ["error", {
             "arrays": "always-multiline",
             "objects": "always-multiline",
-            "imports": "never",
+            "imports": "always-multiline",
             "exports": "never",
             "functions": "never"
         }],
