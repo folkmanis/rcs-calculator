@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "run-s clean",
     "start": "parcel --public-url /",
-    "build": "parcel build --public-url /calculator",
+    "build": "parcel build --public-url /",
     "test": "echo \"Error: no test specified\" && exit 1",
     "clean": "rimraf ./dist ./parcel-cache",
     "lint": "eslint --ext ts,tsx src",

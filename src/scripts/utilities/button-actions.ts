@@ -1,13 +1,12 @@
 import { produce } from 'immer';
-import { CalculatorState, INITIAL_STATE } from '../types/calculator-state.interface';
 import { MAX_UNDO_LEVELS } from '../data/constants';
+import { tokens } from '../data/tokens';
+import { CalculatorState, INITIAL_STATE } from '../types/calculator-state.interface';
 import { DigitToken, FunctionToken, InputToken, MathToken, OpeningBracketToken, OperatorToken } from '../types/token.interface';
 import { evaluateTokens, last } from './math-utilities';
 import { addTokenToInput, inputToMathToken } from './number-input';
-import { tokens } from '../data/tokens';
 
-
-type SequenceFn = (state: CalculatorState, currrentButton: InputToken) => CalculatorState;
+type SequenceFn = (state: CalculatorState, currrentButton: InputToken) => void | CalculatorState | null;
 
 type SequenceMatrix = {
     [key in InputToken['type']]: Record<string, SequenceFn>
@@ -38,7 +37,6 @@ export function processButtonClick(
     if (typeof action === 'function') {
 
         const updatedState = updateState(lastState, currrentButton, action);
-
         if (updatedState !== lastState) {
             return produce(stateStack, draft => {
                 if (stateStack.length >= MAX_UNDO_LEVELS) {
@@ -55,64 +53,66 @@ export function processButtonClick(
 
 function updateState(lastState: CalculatorState, currrentButton: InputToken, sequenceFn: SequenceFn): CalculatorState {
 
-    const updatedState = sequenceFn({ ...lastState, errorState: undefined }, currrentButton);
-
-    if (updatedState === lastState) {
-        return lastState;
-    }
-
-    return produce(updatedState, draft => {
+    const updatedState = produce(lastState, draft => {
+        delete draft.errorState;
+        const result = sequenceFn(draft, currrentButton);
+        if (result === null) {
+            return lastState;
+        }
+        if (result !== undefined) {
+            return result;
+        }
         draft.previousButton = currrentButton;
     });
+
+    return updatedState;
 
 }
 
 
-const reset: SequenceFn = () => INITIAL_STATE;
+const reset: SequenceFn = () => ({ ...INITIAL_STATE });
 
-const calculateResult = (state: CalculatorState) => produce(state, draft => {
+const calculateResult = (state: CalculatorState) => {
     try {
         const result = evaluateTokens(state.tokenStack);
         if (isNaN(result)) {
-            draft.errorState = new Error('Invalid expression');
-            delete draft.result;
+            state.errorState = new Error('Invalid expression');
+            delete state.result;
         } else {
-            draft.numberInput = result.toString();
-            draft.result = result;
+            state.numberInput = result.toString();
+            state.result = result;
         }
     } catch (error) {
-        draft.errorState = error as Error;
-        delete draft.result;
+        state.errorState = error as Error;
+        delete state.result;
     }
-});
+};
 
-const calculateIntermediateResult = (state: CalculatorState) => produce(state, draft => {
+const calculateIntermediateResult = (state: CalculatorState) => {
     try {
         const result = evaluateTokens(state.tokenStack);
         if (!isNaN(result)) {
-            draft.numberInput = result.toString();
+            state.numberInput = result.toString();
         }
     } catch (error) {
     }
-});
+};
 
-const addTokenToState = (state: CalculatorState, currrentButton: InputToken) => produce(state, draft => {
-    const button = currrentButton as MathToken & InputToken;
-    draft.tokenStack.push(button);
-});
+const addTokenToState: SequenceFn = (state: CalculatorState, currrentButton: InputToken) => {
+    state.tokenStack.push(currrentButton as MathToken & InputToken);
+};
 
-const addDigitToState = (state: CalculatorState, currrentButton: InputToken) => {
+const addDigitToState: SequenceFn = (state: CalculatorState, currrentButton: InputToken) => {
 
     const numberUpdate = addTokenToInput(
         state.numberInput,
-        currrentButton as DigitToken);
-
+        currrentButton as DigitToken
+    );
     if (state.numberInput !== numberUpdate) {
-        return produce(state, draft => {
-            draft.numberInput = numberUpdate;
-        });
+        state.numberInput = numberUpdate;
+    } else {
+        return null;
     }
-    return state;
 };
 
 // previous -> next
@@ -120,91 +120,73 @@ const sequenceMatrix: SequenceMatrix = {
 
     'reset': {
         'digit': addDigitToState,
-        'operator': (state, currrentButton) => produce(state, draft => {
-            draft.tokenStack.push(inputToMathToken(state.numberInput));
-            draft.tokenStack.push(currrentButton as MathToken);
-        }),
+        'operator': (state, currrentButton) => {
+            state.tokenStack.push(
+                inputToMathToken(state.numberInput),
+                currrentButton as MathToken
+            );
+        },
         'function': addTokenToState,
         '(': addTokenToState,
     },
     'exec': {
         'reset': reset,
-        'digit': (state, currrentButton) => produce(state, draft => {
-            const button = currrentButton as DigitToken;
-            draft.numberInput = addTokenToInput('0', button);
-            draft.tokenStack = [];
-            delete draft.result;
-        }),
-        'operator': (state, currrentButton) => produce(state, draft => {
-            const button = currrentButton as OperatorToken;
-            draft.tokenStack = [inputToMathToken(state.numberInput), button];
-            delete draft.result;
-        }),
-        'function': (state, currrentButton) => {
-            const button = currrentButton as FunctionToken;
-            const resetState = reset(state, currrentButton);
-            return produce(resetState, draft => {
-                draft.tokenStack.push(button);
-            });
+        'digit': (state, currrentButton) => {
+            state.numberInput = addTokenToInput('0', currrentButton as DigitToken);
+            state.tokenStack = [];
+            delete state.result;
         },
-        '(': (state, currrentButton) => {
-            const resetState = reset(state, currrentButton);
-            resetState.tokenStack.push(currrentButton as OpeningBracketToken);
-            return resetState;
+        'operator': (state, currrentButton) => {
+            state.tokenStack = [inputToMathToken(state.numberInput), currrentButton as OperatorToken];
+            delete state.result;
         },
+        'function': (_, currrentButton) => ({
+            ...INITIAL_STATE,
+            tokenStack: [currrentButton as FunctionToken],
+        }),
+        '(': (_, currrentButton) => ({
+            ...INITIAL_STATE,
+            tokenStack: [currrentButton as OpeningBracketToken],
+        }),
     },
     'digit': {
         'reset': reset,
         'exec': (state, _) => {
-            const updatedState = produce(state, draft => {
-                draft.tokenStack.push(inputToMathToken(state.numberInput));
-            });
-            return calculateResult(updatedState);
+            state.tokenStack.push(inputToMathToken(state.numberInput));
+            calculateResult(state);
         },
         'digit': addDigitToState,
         'operator': (state, currrentButton) => {
-            const updatedState = produce(state, draft => {
-                draft.tokenStack.push(inputToMathToken(state.numberInput));
-            });
-            return addTokenToState(
-                calculateIntermediateResult(updatedState),
-                currrentButton
-            );
+            state.tokenStack.push(inputToMathToken(state.numberInput));
+            calculateIntermediateResult(state);
+            addTokenToState(state, currrentButton);
         },
         ')': (state, currrentButton) => {
-            const updatedState = produce(state, draft => {
-                draft.tokenStack.push(inputToMathToken(state.numberInput));
-
-                const button = currrentButton as MathToken & InputToken;
-                draft.tokenStack.push(button);
-                draft.numberInput = '0';
-
-            });
-            return calculateIntermediateResult(updatedState);
+            const button = currrentButton as MathToken & InputToken;
+            state.tokenStack.push(inputToMathToken(state.numberInput));
+            state.tokenStack.push(button);
+            state.numberInput = '0';
+            calculateIntermediateResult(state);
         },
     },
     'operator': {
         'reset': reset,
         'digit': (state, currrentButton) => {
-            const updatedState = produce(state, draft => {
-                draft.numberInput = '0';
-            });
-            return addDigitToState(updatedState, currrentButton);
+            state.numberInput = '0';
+            return addDigitToState(state, currrentButton);
         },
         'function': addTokenToState,
-        '(': (state, currrentButton) => produce(state, draft => {
+        '(': (state, currrentButton) => {
             const button = currrentButton as MathToken & InputToken;
-            draft.tokenStack.push(button);
-            draft.numberInput = '0';
-        }),
+            state.tokenStack.push(button);
+            state.numberInput = '0';
+        },
     },
     'function': {
         'reset': reset,
         'digit': (state, currrentButton) => {
-            const updatedState = produce(state, draft => {
-                draft.numberInput = '0';
-            });
-            return addDigitToState(updatedState, currrentButton);
+            state.numberInput = '0';
+            return addDigitToState(state, currrentButton);
         },
         'function': addTokenToState,
         '(': addTokenToState,
@@ -212,10 +194,8 @@ const sequenceMatrix: SequenceMatrix = {
     '(': {
         'reset': reset,
         'digit': (state, currrentButton) => {
-            const updatedState = produce(state, draft => {
-                draft.numberInput = '0';
-            });
-            return addDigitToState(updatedState, currrentButton);
+            state.numberInput = '0';
+            return addDigitToState(state, currrentButton);
         },
         'function': addTokenToState,
         '(': addTokenToState,

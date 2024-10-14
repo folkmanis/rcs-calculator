@@ -73,6 +73,7 @@ module.exports = {
                 delimiter: "semi",
                 requireLast: true,
             },
-        }]
+        }],
+        "@typescript-eslint/no-invalid-void-type": "off"
     }
 };

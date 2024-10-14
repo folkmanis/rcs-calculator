@@ -1,4 +1,4 @@
-import React, { StrictMode } from 'react';
+import { StrictMode } from 'react';
 import { Calculator } from './scripts/components/Calculator';
 import './styles.css';
 
